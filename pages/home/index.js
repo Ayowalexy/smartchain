@@ -15,8 +15,8 @@ const HomePage = () => {
 
 
     useEffect(() => {
-        const user_ = localStorage.getItem('user').toString()
-        if(user_){
+        const user_ = localStorage.getItem('user')
+        if(user_?.toString()){
             setUser(user_)
         }
        
