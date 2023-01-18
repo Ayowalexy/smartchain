@@ -1,24 +1,54 @@
 import { VStack, HStack, Text, Box } from "@chakra-ui/react";
 import { BsCheck, BsDoorClosed } from 'react-icons/bs'
 import { usePaystackPayment } from "react-paystack";
+import { useRouter } from "next/router";
+import { useState } from "react";
 
 
 const Pro = () => {
 
-const config = {
-    reference: (new Date()).getTime().toString(),
-    email: "user@example.com",
-    amount: 20000, //Amount is in the country's lowest currency. E.g Kobo, so 20000 kobo = N200
-    publicKey: 'pk_test_dsdfghuytfd2345678gvxxxxxxxxxx',
-};
 
-const handlePayment = async () => {
-    const user = localStorage.getItem('user')
-    console.log("user", user)
-}
+    const [config, setConfig] = useState({
+        reference: (new Date()).getTime().toString(),
+        email: '',
+        amount: 2000, //Amount is in the country's lowest currency. E.g Kobo, so 20000 kobo = N200
+        publicKey: 'pk_test_28d2e0f6c806854b898be87d1d21f0759aa9520b',
+    })
+   
+    const router = useRouter();
+    const initializePayment = usePaystackPayment(config);
+
+   
+
+    // you can call this function anything
+    const onSuccess = (reference) => {
+        // Implementation for whatever you want to do with reference and after success call.
+        alert('Payment successful')
+    };
+
+    // you can call this function anything
+    const onClose = () => {
+        // implementation for  whatever you want to do when the Paystack dialog closed.
+        console.log('closed')
+    }
+
+    const handlePayment = async () => {
+        const user = localStorage.getItem('user')
+
+        if(user?.toString()){
+            setConfig({
+                ...config,
+                email: user.toString().split('"')[1]
+            })
+            
+            initializePayment(onSuccess, onClose)
+        } else {
+            router.push('/auth/login')
+        }
+    }
 
 
-    const Card = ({type }) => (
+    const Card = ({ type }) => (
         <VStack
             padding='20px'
             align='flex-start'
@@ -28,7 +58,7 @@ const handlePayment = async () => {
             borderRadius='20px'
             border='0.5px solid black'
             height='570px'
-            
+
         >
             <Text
                 fontWeight={300}
@@ -108,12 +138,14 @@ const handlePayment = async () => {
                     marginTop='20px'
                     onClick={handlePayment}
                     width='90%'
+                    cursor='pointer'
                     borderRadius='15px'
                     align='center'
+                    zIndex={10000}
                     justify='center'
                     height='40px'
                     color={type !== 'Pro' ? '#000' : '#fff'}
-                    border={`0.5px solid ${type!=='Pro' ? 'black' : 'white'}`}
+                    border={`0.5px solid ${type !== 'Pro' ? 'black' : 'white'}`}
 
                 >
                     <Text>Purchase</Text>
@@ -144,7 +176,7 @@ const handlePayment = async () => {
                 spacing='30px'
                 width='100%'
             >
-                
+
                 <Card type='Premiumm' />
                 <Card type='Pro' />
 
